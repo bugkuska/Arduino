@@ -1,3 +1,23 @@
+/*
+Hardware
+- NodeMCU V3 With Nodebase
+- Relay 4 CH
+- Relay 2 CH
+- DHT11
+- Soil Moisture 
+Software
+- Arduino IDE
+- Blynk 
+*/
+/*
+ความสามารถของระบบ
+- ควบคุมปั้มน้ำ AC/DC ไม่เกิน 3 HP 
+- ควบคุมวาล์ว 1 โซน
+- เลือกโหมดการทำงาน Auto/Manual
+- ตั้งเวลาเปิด-ปิด ปั้มน้ำ วาล์วน้ำ
+- ระบบระบายความร้อนภายในตู้ควบคุม เลือกโหมดการทำงาน Auto/Manual
+*/
+
 #define BLYNK_PRINT Serial  
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
