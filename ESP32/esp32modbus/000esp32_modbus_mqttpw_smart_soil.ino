@@ -10,6 +10,7 @@ Software
 - Arduino IDE
 - Blynk 
 - Blynk Energy Require = 6,000
+- QR-Code Project https://drive.google.com/drive/folders/1JhWiXRPM2ByscpiX286XVaSsY9tuvpRJ?usp=sharing
 - MQTT
 - Node-Red
 */
