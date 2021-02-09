@@ -130,7 +130,7 @@ long lastMsg1 = 0;
 long lastMsg2 = 0;
 //------------------------------------------------------------------------------------------------------------------------//
 //Valve1
-//Slider for set Light limit
+//Slider for set Soil limit
 bool switchStatus1 = 0;                               // 0 = manual,1=auto
 int SoilsensorLimit1 = 0;
 bool manualSwitch1 = 0;
