@@ -1,6 +1,6 @@
 //อ้างอิง https://solarduino.com/pzem-017-dc-energy-meter-online-monitoring-with-blynk-app
 ////////// Pin App blynk////////////////
-// V0 = สัญญาณไวไฟ
+// V0 = สัญญาณ Wi-Fi
 // V1 = Ledblynk
 // V2 = Voltage
 // V3 = Cerrunt
@@ -52,8 +52,8 @@ int blynkIsDownCount=0;
 //MQTT
 #include <PubSubClient.h>
 const char* mqtt_server = "";   //ใส่ MQTT Server 
-WiFiClient nodepzem016_01;      //ถ้าเชื่อมต่อเข้า MQTT Server หลายโหนดพร้อมกันให้เปลี่ยยนชื่อให้ไม่เหมือนกัน
-PubSubClient client(nodepzem016_01);
+WiFiClient nodepzem017_01;      //ถ้าเชื่อมต่อเข้า MQTT Server หลายโหนดพร้อมกันให้เปลี่ยยนชื่อให้ไม่เหมือนกัน
+PubSubClient client(nodepzem017_01);
 
 //Max485
 #include <ModbusMaster.h>
@@ -208,7 +208,7 @@ wifiManager.setTimeout(60);
 //and goes into a blocking loop awaiting configuration
 //if (WiFi.SSID()!="") wifiManager.setConfigPortalTimeout(60);
  
-if (!wifiManager.autoConnect("nodepzem016_01", "password")) {
+if (!wifiManager.autoConnect("nodepzem017_01", "password")) {
     Serial.println("failed to connect and hit timeout");
     delay(100);
     //reset and try again, or maybe put it to deep sleep
@@ -291,7 +291,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("nodepzem016_01")) {
+    if (client.connect("nodepzem017_01")) {
       Serial.println("connected1");  
     } else {
       Serial.print("failed, rc=");
@@ -677,7 +677,7 @@ if (!client.connected()) {
     //reconnect();
   }
   if(!client.loop())
-  client.connect("nodepzem016_01");
+  client.connect("nodepzem017_01");
     
 Blynk.run();
 timer.run();
