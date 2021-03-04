@@ -967,7 +967,7 @@ void LDR1(){
         LedBlynkLDR1.on(); 
 
         //For Test Modbus 16ch relay
-        relayControl_modbusRTU(3,1,1);
+        relayControl_modbusRTU(3,1,1);      // (Modbus Device address,channel,on=1/off=0)
         relayControl_modbusRTU(3,2,1);
         relayControl_modbusRTU(3,3,1);
         relayControl_modbusRTU(3,4,1);
