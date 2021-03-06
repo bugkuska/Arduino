@@ -490,7 +490,7 @@ int id = 3;
   if(switchStatus1)
   {
     // auto
-    if(temp1 > thsensorLimit1)
+    if(humi1 <= thsensorLimit1)
     {
         relayControl_modbusRTU(4,1,1);
         Blynk.virtualWrite(V2, 1);                
@@ -565,7 +565,7 @@ int id = 5;
   if(switchStatus2)
   {
     // auto
-    if(temp2 > thsensorLimit2)
+    if(humi2 <= thsensorLimit2)
     {
         relayControl_modbusRTU(6,1,1);
         Blynk.virtualWrite(V4, 1);                
@@ -641,7 +641,7 @@ int id = 7;
   if(switchStatus3)
   {
     // auto
-    if(temp3 > thsensorLimit3)
+    if(humi3 <= thsensorLimit3)
     {
         relayControl_modbusRTU(8,1,1);
         Blynk.virtualWrite(V6, 1);                
@@ -717,7 +717,7 @@ int id = 9;
   if(switchStatus4)
   {
     // auto
-    if(temp4 > thsensorLimit4)
+    if(humi4 <= thsensorLimit4)
     {
         relayControl_modbusRTU(10,1,1);
         Blynk.virtualWrite(V8, 1);                
@@ -792,7 +792,7 @@ int id = 11;
   if(switchStatus5)
   {
     // auto
-    if(temp5 > thsensorLimit5)
+    if(humi5 <= thsensorLimit5)
     {
         relayControl_modbusRTU(12,1,1);
         Blynk.virtualWrite(V10, 1);                
@@ -867,7 +867,7 @@ int id = 13;
   if(switchStatus6)
   {
     // auto
-    if(temp6 > thsensorLimit6)
+    if(humi6 <= thsensorLimit6)
     {
         relayControl_modbusRTU(14,1,1);
         Blynk.virtualWrite(V12, 1);                
