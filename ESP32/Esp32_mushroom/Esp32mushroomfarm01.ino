@@ -392,7 +392,7 @@ BLYNK_WRITE(V64)
 ////////////////////Update Temp&Humi setting////////////////////////////
 
 /////////////////////Update manualSwitch///////////////////////////
-BLYNK_WRITE(V21)
+BLYNK_WRITE(V22)
 {
   manualSwitchcfan = param.asInt();
 }
@@ -418,7 +418,7 @@ int id = 2;
     if(tempcfan > cfansensorLimit)
     {
         relayControl_modbusRTU(1,1,1);
-        Blynk.virtualWrite(V21, 1);                
+        Blynk.virtualWrite(V22, 1);                
         Blynk.setProperty(Widget_LED_Fan1, "color", "#C70039");
         Blynk.setProperty(Widget_LED_Fan1, "label", "เปิดพัดลมระบายอากาศ");
         LedBlynkFan1.on(); 
@@ -426,7 +426,7 @@ int id = 2;
     else
     {
          relayControl_modbusRTU(1,1,0);
-        Blynk.virtualWrite(V21, 0);
+        Blynk.virtualWrite(V22, 0);
         Blynk.virtualWrite(Widget_LED_Fan1, 0);
         Blynk.setProperty(Widget_LED_Fan1, "label", "ปิดพัดลมระบายอากาศ");                       
         LedBlynkFan1.off();  
