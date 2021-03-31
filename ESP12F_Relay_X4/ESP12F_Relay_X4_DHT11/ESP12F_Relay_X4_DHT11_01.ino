@@ -99,7 +99,9 @@ void setup()
    //Start read DHT11
   dht.begin();  //เริ่มอ่านข้อมูล DHT Sensor
   
-  Blynk.begin(ssid, pass,auth);
+  //Connect to Blynk Server
+  Blynk.begin(auth, ssid, pass, "blynk-cloud.com", 8442);
+  
   timer.setInterval(10000L, reconnecting);  
   timer.setInterval(5000L, dhtSensorData);
 }
