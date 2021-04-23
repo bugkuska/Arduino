@@ -1,13 +1,14 @@
-//*****Define MCU Digital Pin*******//
-//Relay1_btn1         D1
-//Relay2_btn2         D2
-//Relay3_btn3         D3
-//Relay4_btn4         D4
-//DHT11               D5
-//ว่าง                  D0
-//ว่าง                  D6
-//ว่าง                  D7
-//*****Define MCU Digital Pin*******//
+//*****Define MCU Pin*******//
+//ว่าง                 D0
+//SCL                 D1
+//SDA                 D2
+//Relay1_btn1         D3
+//Relay2_btn2         D4
+//Relay3_btn3         D5
+//Relay4_btn4         D6
+//DHT11               D7
+//Soil Moisture       A0
+//*****Define MCU Pin*******//
 
 //*****Define Blynk Virtual Pin*****//
 //V0  ค่าความชื้นในดิน
@@ -26,13 +27,22 @@
 //V13 Auto&Manual btn2
 //V14 Slider btn2
 //*****Define Blynk Virtual Pin*****//
-
 #define BLYNK_PRINT Serial
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
-//#include <SimpleTimer.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager
+#include <SimpleTimer.h>
+#include <ArduinoJson.h>          //https://github.com/bblanchon/ArduinoJson
 BlynkTimer timer;
-int blynkIsDownCount = 0;
+int blynkIsDownCount=0;
+char blynk_token[34] = "";
+
+//RTC Widget
+#include <TimeLib.h>
+#include <WidgetRTC.h>
+WidgetRTC rtc;
 
 //Slider for set Soil Moisture limit
 //ตรวจสอบเงื่อนไขสำหรับเปิดปิดปุ่มที่ 1 ในโหมดการทำงานอัตโนมัติ
@@ -42,7 +52,7 @@ bool manualSwitch1 = 0;
 
 //DHT11
 #include <DHT.h>
-#define DHTPIN D5
+#define DHTPIN D7
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 //Slider for set temperature limit
@@ -52,25 +62,25 @@ int templimit = 0;
 bool manualSwitch2 = 0;
 
 //BTN1
-#define Relay1_btn1   D1
+#define Relay1_btn1   D3
 #define Widget_LED_btn1 V1          //ไฟสถานะปุ่ม 1
 #define Widget_Btn_btn1 V2          //ปุ่ม เปิด-ปิด 1
 WidgetLED LedBlynkbtn1(Widget_LED_btn1);
 
 //BTN2
-#define Relay2_btn2   D2
+#define Relay2_btn2   D4
 #define Widget_LED_btn2 V3          //ไฟสถานะปุ่ม 2
 #define Widget_Btn_btn2 V4          //ปุ่ม เปิด-ปิด 2
 WidgetLED LedBlynkbtn2(Widget_LED_btn2);
 
 //BTN3
-#define Relay3_btn3   D3
+#define Relay3_btn3   D5
 #define Widget_LED_btn3 V5          //ไฟสถานะปุ่ม 3
 #define Widget_Btn_btn3 V6          //ปุ่ม เปิด-ปิด 3
 WidgetLED LedBlynkbtn3(Widget_LED_btn3);
 
 //BTN4
-#define Relay4_btn4   D4
+#define Relay4_btn4   D6
 #define Widget_LED_btn4 V7          //ไฟสถานะปุ่ม 4
 #define Widget_Btn_btn4 V8          //ปุ่ม เปิด-ปิด 4
 WidgetLED LedBlynkbtn4(Widget_LED_btn4);
@@ -78,46 +88,148 @@ WidgetLED LedBlynkbtn4(Widget_LED_btn4);
 //V9  Humidity
 //V10 Temperature
 
-//Wi-Fi and blynk credentials   
-char auth[] = "";     //Blynk Token
-char ssid[] = "";     //Wi-Fi                
-char pass[] = "";     //Password เชื่อมต่อ Wi-Fi                         
+//flag for saving data
+bool shouldSaveConfig = false;
+
+//callback notifying us of the need to save config
+void saveConfigCallback () {
+  Serial.println("Should save config");
+  shouldSaveConfig = true;
+}                       
 
 //Setup Function
-void setup()
-{
+  void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
-  Serial.println("Starting...");
-  WiFi.begin(ssid,pass);
-  while (WiFi.status() != WL_CONNECTED)
-   {
-    delay(250);
-    Serial.print(".");
-   }
-  Serial.println("WiFi Connected");
-  Serial.println("IP Address: ");
-  Serial.println(WiFi.localIP());
   
+  Serial.begin(9600);
+  Serial.println();
+  //clean FS, for testing
+  //SPIFFS.format();
+
+  //read configuration from FS json
+  Serial.println("mounting FS...");
+
+  if (SPIFFS.begin()) {
+    Serial.println("mounted file system");
+    if (SPIFFS.exists("/config.json")) {
+      //file exists, reading and loading
+      Serial.println("reading config file");
+      File configFile = SPIFFS.open("/config.json", "r");
+      if (configFile) {
+        Serial.println("opened config file");
+        size_t size = configFile.size();
+        // Allocate a buffer to store contents of the file.
+        std::unique_ptr<char[]> buf(new char[size]);
+
+        configFile.readBytes(buf.get(), size);
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& json = jsonBuffer.parseObject(buf.get());
+        json.printTo(Serial);
+        if (json.success()) {
+          Serial.println("\nparsed json");
+
+          //strcpy(mqtt_server, json["mqtt_server"]);
+          //strcpy(mqtt_port, json["mqtt_port"]);
+          strcpy(blynk_token, json["blynk_token"]);
+
+        } else {
+          Serial.println("failed to load json config");
+        }
+      }
+    }
+  } else {
+    Serial.println("failed to mount FS");
+  }
+  //end read
+      WiFiManagerParameter custom_blynk_token("blynk", "blynk token", blynk_token, 34);
+
+  //WiFiManager
+  //Local intialization. Once its business is done, there is no need to keep it around
+    WiFiManager wifiManager;
+  
+  //set config save notify callback
+    wifiManager.setSaveConfigCallback(saveConfigCallback);
+
+    wifiManager.addParameter(&custom_blynk_token);
+
+  //reset settings - for testing
+  //wifiManager.resetSettings();
+
+  //set minimu quality of signal so it ignores AP's under that quality
+  //defaults to 8%
+  //wifiManager.setMinimumSignalQuality();
+  
+  //sets timeout until configuration portal gets turned off
+  //useful to make it all retry or go to sleep
+  //in seconds
+  wifiManager.setTimeout(120);
+
+  //fetches ssid and pass and tries to connect
+  //if it does not connect it starts an access point with the specified name
+  //here  "AutoConnectAP"
+  //and goes into a blocking loop awaiting configuration
+//if (WiFi.SSID()!="") wifiManager.setConfigPortalTimeout(60);
+ 
+  if (!wifiManager.autoConnect("NodeMCU_SS01", "password")) {
+    Serial.println("failed to connect and hit timeout");
+    delay(100);
+    //reset and try again, or maybe put it to deep sleep
+    ESP.restart();
+  } 
+  if ((WiFi.status()!=WL_CONNECTED) )
+  {
+      Serial.println("failed to connect");
+  } 
+  else
+  {
+    //if you get here you have connected to the WiFi
+    Serial.println("connected........:)");
+    Serial.print("local ip: ");
+    Serial.println(WiFi.localIP());
+  }
+  
+  //read updated parameters
+  //strcpy(mqtt_server, custom_mqtt_server.getValue());
+  //strcpy(mqtt_port, custom_mqtt_port.getValue());
+  strcpy(blynk_token, custom_blynk_token.getValue());
+  //save the custom parameters to FS
+  if (shouldSaveConfig) {
+    Serial.println("saving config");
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject& json = jsonBuffer.createObject();
+    //json["mqtt_server"] = mqtt_server;
+    //json["mqtt_port"] = mqtt_port;
+    json["blynk_token"] = blynk_token;
+    File configFile = SPIFFS.open("/config.json", "w");
+    if (!configFile) {
+      Serial.println("failed to open config file for writing");
+    }
+    json.printTo(Serial);
+    json.printTo(configFile);
+    configFile.close();
+    //end save
+  }
   // Setup Pin Mode
-  pinMode(Relay1_btn1,OUTPUT);                // NODEMCU PIN gpio16 
-  pinMode(Relay2_btn2,OUTPUT);                // NODEMCU PIN gpio14
-  pinMode(Relay3_btn3,OUTPUT);                // NODEMCU PIN gpio12   
-  pinMode(Relay4_btn4,OUTPUT);                // NODEMCU PIN GPIO13         
+  pinMode(Relay1_btn1,OUTPUT);                // NODEMCU PIN D3 
+  pinMode(Relay2_btn2,OUTPUT);                // NODEMCU PIN D4
+  pinMode(Relay3_btn3,OUTPUT);                // NODEMCU PIN D5   
+  pinMode(Relay4_btn4,OUTPUT);                // NODEMCU PIN D6         
   
   // Set Defult Relay Status
-  digitalWrite(Relay1_btn1,LOW);              // NODEMCU PIN gpio16
-  digitalWrite(Relay2_btn2,LOW);              // NODEMCU PIN gpio14
-  digitalWrite(Relay3_btn3,LOW);              // NODEMCU PIN gpio12
-  digitalWrite(Relay4_btn4,LOW);              // NODEMCU PIN gpio13
+  digitalWrite(Relay1_btn1,LOW);              // NODEMCU PIN D3
+  digitalWrite(Relay2_btn2,LOW);              // NODEMCU PIN D4
+  digitalWrite(Relay3_btn3,LOW);              // NODEMCU PIN D5
+  digitalWrite(Relay4_btn4,LOW);              // NODEMCU PIN D6
    
    //Start read DHT11
   dht.begin();  //เริ่มอ่านข้อมูล DHT Sensor
   
-  Blynk.begin(ssid, pass,auth);
+ //Connect to Blynk Server
+  //Blynk.begin(auth, ssid, pass, "blynk-cloud.com", 8442);
+  Blynk.config(blynk_token);
   timer.setInterval(30000L, reconnecting);  
-  timer.setInterval(5000L, dhtSensorData);
-  timer.setInterval(5000L, getsoilSensorData);
+  timer.setInterval(5000L, getSoilSensorData);
+  timer.setInterval(5000L, getDHTSensorData);
 }
 
 // Update switchStatus1 on Soil Moisture
@@ -138,7 +250,7 @@ BLYNK_WRITE(V2)
   manualSwitch1 = param.asInt();
 }
 
-void getsoilSensorData()
+void getSoilSensorData()
 {
   float soil_percentage;
   int sensor_analog;
@@ -211,7 +323,7 @@ BLYNK_WRITE(V4)
 }
 
 //DHT11
-void dhtSensorData(){
+void getDHTSensorData(){
   float h = dht.readHumidity();
   float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
   if (isnan(h) || isnan(t)){ 
@@ -260,7 +372,6 @@ void dhtSensorData(){
     // manaul
   }
 }
-
 
 //****BUTTON ON/OFF btn3****
  BLYNK_WRITE(Widget_Btn_btn3){
@@ -317,7 +428,7 @@ void reconnecting()
     Blynk.connect(5000);
     Blynk.syncAll();
   }
-  if (blynkIsDownCount >= 10){
+  if (blynkIsDownCount >= 5){
     ESP.reset();
   }
 }
