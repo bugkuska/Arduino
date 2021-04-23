@@ -2,10 +2,10 @@
 //ว่าง                 D0
 //SCL                 D1
 //SDA                 D2
-//Relay1_btn1         D3
-//Relay2_btn2         D4
-//Relay3_btn3         D5
-//Relay4_btn4         D6
+//ว่าง                 D3
+//Relay1_btn1         D5
+//Relay2_btn2         D6
+//Relay3_ledblynk     D4
 //DHT11               D7
 //Soil Moisture       A0
 //*****Define MCU Pin*******//
@@ -16,10 +16,6 @@
 //V2  ปุ่ม เปิด-ปิด 1
 //V3  ไฟสถานะปุ่ม 2
 //V4  ปุ่ม เปิด-ปิด 2
-//V5  ไฟสถานะปุ่ม 3
-//V6  ปุ่ม เปิด-ปิด 3
-//V7  ไฟสถานะปุ่ม 4
-//V8  ปุ่ม เปิด-ปิด 4
 //V9  Temperature
 //V10 Humidity
 //V11 Auto&Manual btn1
@@ -62,28 +58,23 @@ int templimit = 0;
 bool manualSwitch2 = 0;
 
 //BTN1
-#define Relay1_btn1   D3
+//V11 Auto&Manual btn1
+//V12 Slider btn1
+#define Relay1_btn1   D5
 #define Widget_LED_btn1 V1          //ไฟสถานะปุ่ม 1
 #define Widget_Btn_btn1 V2          //ปุ่ม เปิด-ปิด 1
 WidgetLED LedBlynkbtn1(Widget_LED_btn1);
 
 //BTN2
-#define Relay2_btn2   D4
+//V13 Auto&Manual btn2
+//V14 Slider btn2
+#define Relay2_btn2   D6
 #define Widget_LED_btn2 V3          //ไฟสถานะปุ่ม 2
 #define Widget_Btn_btn2 V4          //ปุ่ม เปิด-ปิด 2
 WidgetLED LedBlynkbtn2(Widget_LED_btn2);
 
 //BTN3
-#define Relay3_btn3   D5
-#define Widget_LED_btn3 V5          //ไฟสถานะปุ่ม 3
-#define Widget_Btn_btn3 V6          //ปุ่ม เปิด-ปิด 3
-WidgetLED LedBlynkbtn3(Widget_LED_btn3);
-
-//BTN4
-#define Relay4_btn4   D6
-#define Widget_LED_btn4 V7          //ไฟสถานะปุ่ม 4
-#define Widget_Btn_btn4 V8          //ปุ่ม เปิด-ปิด 4
-WidgetLED LedBlynkbtn4(Widget_LED_btn4);
+#define Relay3_ledblynk   D4
 
 //V9  Humidity
 //V10 Temperature
@@ -210,16 +201,14 @@ void saveConfigCallback () {
     //end save
   }
   // Setup Pin Mode
-  pinMode(Relay1_btn1,OUTPUT);                // NODEMCU PIN D3 
-  pinMode(Relay2_btn2,OUTPUT);                // NODEMCU PIN D4
-  pinMode(Relay3_btn3,OUTPUT);                // NODEMCU PIN D5   
-  pinMode(Relay4_btn4,OUTPUT);                // NODEMCU PIN D6         
+  pinMode(Relay1_btn1,OUTPUT);                // NODEMCU PIN D5 
+  pinMode(Relay2_btn2,OUTPUT);                // NODEMCU PIN D6
+  pinMode(Relay3_ledblynk,OUTPUT);            // NODEMCU PIN D4         
   
   // Set Defult Relay Status
-  digitalWrite(Relay1_btn1,LOW);              // NODEMCU PIN D3
-  digitalWrite(Relay2_btn2,LOW);              // NODEMCU PIN D4
-  digitalWrite(Relay3_btn3,LOW);              // NODEMCU PIN D5
-  digitalWrite(Relay4_btn4,LOW);              // NODEMCU PIN D6
+  digitalWrite(Relay1_btn1,LOW);              // NODEMCU PIN D5
+  digitalWrite(Relay2_btn2,LOW);              // NODEMCU PIN D6
+  digitalWrite(Relay3_ledblynk,LOW);          // NODEMCU PIN D4
    
    //Start read DHT11
   dht.begin();  //เริ่มอ่านข้อมูล DHT Sensor
@@ -373,40 +362,6 @@ void getDHTSensorData(){
   }
 }
 
-//****BUTTON ON/OFF btn3****
- BLYNK_WRITE(Widget_Btn_btn3){
-      int valuebtn3 = param.asInt();
-      if(valuebtn3 == 1){
-        digitalWrite(Relay3_btn3,HIGH);
-        Blynk.setProperty(Widget_LED_btn3, "color", "#00FF00");
-        Blynk.setProperty(Widget_LED_btn3, "label", "เปิดปุ่มที่ 3");
-        LedBlynkbtn3.on();
-        
-      }
-       else{              
-        digitalWrite(Relay3_btn3,LOW);
-        Blynk.setProperty(Widget_LED_btn3, "label", "ปิดปุ่มที่ 3");
-        LedBlynkbtn3.off();          
-     }
-}
-
-//****BUTTON ON/OFF btn4****
- BLYNK_WRITE(Widget_Btn_btn4){
-      int valuebtn4 = param.asInt();
-      if(valuebtn4 == 1){
-        digitalWrite(Relay4_btn4,HIGH);
-        Blynk.setProperty(Widget_LED_btn4, "color", "#00FF00");
-        Blynk.setProperty(Widget_LED_btn4, "label", "เปิดปุ่มที่ 4");
-        LedBlynkbtn4.on();
-        
-      }
-       else{              
-        digitalWrite(Relay4_btn4,LOW);
-        Blynk.setProperty(Widget_LED_btn4, "label", "ปิดปุ่มที่ 4");
-        LedBlynkbtn4.off();          
-     }
-}
-
 //Blynk connected
 BLYNK_CONNECTED()
 {
@@ -416,6 +371,7 @@ BLYNK_CONNECTED()
  if (Blynk.connected())
  {
     Serial.println("Blynk Connected");
+    digitalWrite(Relay3_ledblynk,LOW);
  }
 }
 
