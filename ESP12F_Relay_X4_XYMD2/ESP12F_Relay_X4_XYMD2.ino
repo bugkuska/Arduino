@@ -4,7 +4,7 @@
 //Relay3_btn3       12
 //Relay4_btn4       13
 //MAX485 DI=TX      15
-//MAX485_RE_NEG     5
+//MAX485_RE_NEG=DE  5
 //MAX485_RE         4
 //MAX485 RO=RX      2   
 //ว่าง                0
@@ -30,17 +30,17 @@
 BlynkTimer timer;
 int blynkIsDownCount = 0;
 
-//Modbus
+//======Modbus=====//
 #include <SoftwareSerial.h>
 #include <ModbusMaster.h>
 SoftwareSerial mySerial(2, 15); // RO=RX, DI=TX
 
 #define MAX485_RE      4  //RE
-#define MAX485_RE_NEG  5
+#define MAX485_RE_NEG  5  //DE
 
 // instantiate ModbusMaster object
 ModbusMaster node;
-//End Modbus
+//======Modbus=====//
 
 //BTN1
 #define Relay1_btn1   16
@@ -54,7 +54,6 @@ WidgetLED LedBlynkbtn1(Widget_LED_btn1);
 #define Widget_Btn_btn2 V4          //ปุ่ม เปิด-ปิด 2
 WidgetLED LedBlynkbtn2(Widget_LED_btn2);
 
-
 //BTN3
 #define Relay3_btn3   12
 #define Widget_LED_btn3 V5          //ไฟสถานะปุ่ม 3
@@ -67,30 +66,26 @@ WidgetLED LedBlynkbtn3(Widget_LED_btn3);
 #define Widget_Btn_btn4 V8          //ปุ่ม เปิด-ปิด 4
 WidgetLED LedBlynkbtn4(Widget_LED_btn4);
 
-//V9  Humidity
-//V10 Temperature
- 
-
-//Modbus Pre & Post Transmission
+//==Modbus Pre & Post Transmission==//
 void preTransmission()
 {
   digitalWrite(MAX485_RE_NEG, 1);
   digitalWrite(MAX485_RE, 1);
 }
-
 void postTransmission()
 {
   digitalWrite(MAX485_RE_NEG, 0);
   digitalWrite(MAX485_RE, 0);
 }
-//End Modbus Pre & Post Transmission
+//==Modbus Pre & Post Transmission==//
 
-//Wi-Fi and blynk credentials   
-char auth[] = "";
-char ssid[] = "";     //Wi-Fi                
-char pass[] = "";     //Password เชื่อมต่อ Wi-Fi                         
+//==Wi-Fi and blynk credentials====//   
+char auth[] = ""; //Blynk auth token
+char ssid[] = "";                 //Wi-Fi                
+char pass[] = "";                       //Password เชื่อมต่อ Wi-Fi                         
+//==Wi-Fi and blynk credentials====//  
 
-
+//=====Setup Function=====//
 void setup()
 {
   //Modbus pinMode
@@ -102,7 +97,7 @@ void setup()
   Serial.println("start init serial 0");
   Serial.begin(9600);
   
-    Serial.println("Starting...");
+  Serial.println("Starting...");
   WiFi.begin(ssid,pass);
   while (WiFi.status() != WL_CONNECTED)
    {
@@ -122,7 +117,7 @@ void setup()
     Serial.println("loop for init software serial"); // wait for serial port to connect. Needed for Native USB only
   }
   
-  // Modbus slave ID 1
+  //Modbus slave ID 1
   node.begin(1, mySerial);
   
   // Callbacks allow us to configure the RS485 transceiver correctly
@@ -148,10 +143,10 @@ void setup()
   timer.setInterval(30000L, reconnecting);  
   timer.setInterval(5000L, Modbus_XYMD201);
 }
+//=====Setup Function=====//
 
-//Modbus_XYMD201
-void Modbus_XYMD201(){
-  
+//=====Modbus_XYMD201=====//
+void Modbus_XYMD201(){  
  uint8_t result;
  uint16_t data[2]; // prepare variable of storage data from sensor
 
@@ -171,17 +166,16 @@ void Modbus_XYMD201(){
   Blynk.virtualWrite(V9, temp);
   Blynk.virtualWrite(V10, humi);
   } 
+//=====Modbus_XYMD201=====//
 
-
-//****BUTTON ON/OFF btn1****
+//****BUTTON ON/OFF btn1****//
  BLYNK_WRITE(Widget_Btn_btn1){
       int valuebtn1 = param.asInt();
       if(valuebtn1 == 1){
         digitalWrite(Relay1_btn1,HIGH);
         Blynk.setProperty(Widget_LED_btn1, "color", "#00FF00");
         Blynk.setProperty(Widget_LED_btn1, "label", "เปิดปุ่มที่ 1");
-        LedBlynkbtn1.on();
-        
+        LedBlynkbtn1.on();       
       }
        else{              
         digitalWrite(Relay1_btn1,LOW);
@@ -189,8 +183,9 @@ void Modbus_XYMD201(){
         LedBlynkbtn1.off();          
      }
 }
+//****BUTTON ON/OFF btn1****//
 
-//****BUTTON ON/OFF btn2****
+//****BUTTON ON/OFF btn2****//
  BLYNK_WRITE(Widget_Btn_btn2){
       int valuebtn2 = param.asInt();
       if(valuebtn2 == 1){
@@ -206,8 +201,9 @@ void Modbus_XYMD201(){
         LedBlynkbtn2.off();          
      }
 }
+//****BUTTON ON/OFF btn2****//
 
-//****BUTTON ON/OFF btn3****
+//****BUTTON ON/OFF btn3****//
  BLYNK_WRITE(Widget_Btn_btn3){
       int valuebtn3 = param.asInt();
       if(valuebtn3 == 1){
@@ -223,8 +219,9 @@ void Modbus_XYMD201(){
         LedBlynkbtn3.off();          
      }
 }
+//****BUTTON ON/OFF btn3****//
 
-//****BUTTON ON/OFF btn4****
+//****BUTTON ON/OFF btn4****//
  BLYNK_WRITE(Widget_Btn_btn4){
       int valuebtn4 = param.asInt();
       if(valuebtn4 == 1){
@@ -240,8 +237,9 @@ void Modbus_XYMD201(){
         LedBlynkbtn4.off();          
      }
 }
+//****BUTTON ON/OFF btn4****//
 
-
+//=====Blynk connected=====//
 BLYNK_CONNECTED()
 {
     Serial.println(".");//per debug
@@ -253,6 +251,9 @@ BLYNK_CONNECTED()
  }
 }
 
+//=====Blynk connected=====//
+
+//=====Blynk reconnect=====//
 void reconnecting()
 {
   if (!Blynk.connected())
@@ -266,7 +267,9 @@ void reconnecting()
     ESP.reset();
   }
 }
+//=====Blynk reconnect=====//
 
+//=====Loop function======//
 void loop()
 {
 
@@ -277,4 +280,4 @@ void loop()
   }
    timer.run();  
 }
-//loop end
+//=====Loop function======//
