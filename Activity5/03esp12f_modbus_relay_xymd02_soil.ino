@@ -13,7 +13,7 @@ int blynkIsDownCount = 0;
 //=====Wi-Fi & Blynk Credential=====//
 char ssid[] = "smfthailand_trainning";                    //ชื่อ SSID ที่เราต้องการเชื่อมต่อ        
 char pass[] = "0814111142";                               //รหัสผ่าน WI-FI
-char auth[] = "";         //Auth token from blynk app 
+char auth[] = "";                                         //Auth token from blynk app 
 //=====Wi-Fi & Blynk Credential=====//
 
 //==Pool size for Modbus Write command==//
@@ -172,18 +172,18 @@ void Mosbus_soilMoisture()
 {
   uint8_t result;
   //uint16_t data[2]; // prepare variable of storage data from sensor
-  float soilMoisture = (node1.getResponseBuffer(1)/100.0f);
+  float soilMoisture = (node2.getResponseBuffer(1)/100.0f);
   
-  Serial.println("Get data");
-  result = node1.readInputRegisters(0x0000, 3); // Read 2 registers starting at 1)
-  if (result == node1.ku8MBSuccess)
+  Serial.println("Get SoilMoister Data");
+  result = node2.readInputRegisters(0x0000, 3); // Read 2 registers starting at 1)
+  if (result == node2.ku8MBSuccess)
   {
     Serial.print("Soil Moisture: ");
-    Serial.print(soilMoisture);
-    //Serial.println(node1.getResponseBuffer(1)/100.0f);
+    //Serial.print(soilMoisture);
+    Serial.println(node2.getResponseBuffer(1)/100.0f);
   }
   delay(1000);
-  Blynk.virtualWrite(V11,soilMoisture);
+  Blynk.virtualWrite(V11,result);
   
 }
 //====Modbus RTU SoilMoisture Sensor====//
