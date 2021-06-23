@@ -183,7 +183,7 @@ void Mosbus_soilMoisture()
     Serial.println(node2.getResponseBuffer(1)/100.0f);
   }
   delay(1000);
-  Blynk.virtualWrite(V11,result);
+  Blynk.virtualWrite(V11,soilMoisture);
   
 }
 //====Modbus RTU SoilMoisture Sensor====//
