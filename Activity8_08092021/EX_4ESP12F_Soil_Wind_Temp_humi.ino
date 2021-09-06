@@ -1,5 +1,5 @@
-#define BLYNK_TEMPLATE_ID "TMPLVBo6WCZN"
-#define BLYNK_DEVICE_NAME "ESP12FX4WSDL13 C6713"
+#define BLYNK_TEMPLATE_ID ""
+#define BLYNK_DEVICE_NAME ""
 #define BLYNK_FIRMWARE_VERSION        "0.1.0"
 
 //*****MCU Digital Pin*******//
@@ -121,7 +121,7 @@ void postTransmission3()
 
 
 //==Wi-Fi and blynk credentials====//   
-char auth[] = "jZaep6yoIIM0gxswM7L9tf3fLkS49Urp";
+char auth[] = "";                                       //Auth token 
 char ssid[] = "smfthailand_trainning";                  //Wi-Fi                
 char pass[] = "0814111142";                             //Password เชื่อมต่อ Wi-Fi                         
 //==Wi-Fi and blynk credentials====//  
