@@ -1,7 +1,7 @@
 //==============New Blynk IoT===============//
 #define BLYNK_TEMPLATE_ID ""
 #define BLYNK_DEVICE_NAME ""
-#define BLYNK_FIRMWARE_VERSION        "0.1.0" //time interval 10 secs
+#define BLYNK_FIRMWARE_VERSION        "0.2.0" //time interval 10 secs
 //==============New Blynk IoT===============//
 
 //============Blynk & WiFiManager===========//
@@ -60,23 +60,19 @@ int8_t pool_size1;
 //==========Define MCU Digital Pin==========//
 
 //=========Define Blynk Virtual Pin=========//
-//V1  ปุ่ม เปิด-ปิด ปั้มน้ำ 1
-//V2  ปุ่ม เปิด-ปิด 2
-//V3  ปุ่ม เปิด-ปิด 3
-//V4  ปุ่ม เปิด-ปิด 4
-//V5  ปุ่ม เปิด-ปิด 5
-//V6  ปุ่ม เปิด-ปิด 6
-//V7  ปุ่ม เปิด-ปิด 7
-//V8  ปุ่ม เปิด-ปิด 8
+//V0  ปุ่ม เปิด-ปิด ปั้มน้ำ 1
+//V1  ปุ่ม เปิด-ปิด วาล์ว1
+//V2  ปุ่ม เปิด-ปิด วาล์ว2
+//V3  ปุ่ม เปิด-ปิด วาล์ว3
+//V4  ปุ่ม เปิด-ปิด วาล์ว4
 //=========Define Blynk Virtual Pin=========//
 
 //=====BTN1=====//
-#define Widget_Btn_btn1 V1          //ปุ่ม เปิด-ปิด 1
-
-#define Widget_Btn_btn5 V5          //ปุ่ม เปิด-ปิด 5
-#define Widget_Btn_btn6 V6          //ปุ่ม เปิด-ปิด 6
-#define Widget_Btn_btn7 V7          //ปุ่ม เปิด-ปิด 7
-#define Widget_Btn_btn8 V8          //ปุ่ม เปิด-ปิด 8
+#define Widget_Btn_Pump V0          //ปุ่ม เปิด-ปิด ปั้มน้ำ
+#define Widget_Btn_Valve1 V1          //ปุ่ม วาล์ว1
+#define Widget_Btn_Valve2 V2          //ปุ่ม วาล์ว2
+#define Widget_Btn_Valve3 V3          //ปุ่ม วาล์ว3
+#define Widget_Btn_Valve4 V4          //ปุ่ม วาล์ว4
 
 //==Modbus Pre & Post Transmission1==//
 void preTransmission1()
@@ -244,10 +240,10 @@ void setup()
 }
 //=====Setup Function=====//
 
-//****BUTTON ON/OFF SW1 pump****//
- BLYNK_WRITE(Widget_Btn_SW1){
-      int valueSW1 = param.asInt();
-      if(valueSW1 == 1){    
+//****BUTTON ON/OFF SW_Pump****//
+ BLYNK_WRITE(Widget_Btn_Pump){
+      int valueSW_Pump = param.asInt();
+      if(valueSW_Pump == 1){    
         //Modbus command to ON/OFF Relay           
         pool_size1 = node1.writeSingleRegister(0x01,0x0100);
       }
@@ -255,52 +251,12 @@ void setup()
        pool_size1 = node1.writeSingleRegister(0x01,0x0200);
      }
 } 
-//****BUTTON ON/OFF SW1 pump****//
+//****BUTTON ON/OFF SW_Pump****//
 
-
-//****BUTTON ON/OFF SW2****//
- /*BLYNK_WRITE(Widget_Btn_SW2){
-      int valueSW2 = param.asInt();
-      if(valueSW2 == 1){    
-        //Modbus command to ON/OFF Relay           
-        pool_size1 = node1.writeSingleRegister(0x02,0x0100);
-      }
-       else{                    
-       pool_size1 = node1.writeSingleRegister(0x02,0x0200);
-     }
-} */
-//****BUTTON ON/OFF SW2****//
-
-//****BUTTON ON/OFF SW3****//
-/* BLYNK_WRITE(Widget_Btn_SW3){
-      int valueSW3 = param.asInt();
-      if(valueSW3 == 1){    
-        //Modbus command to ON/OFF Relay           
-        pool_size1 = node1.writeSingleRegister(0x03,0x0100);
-      }
-       else{                    
-       pool_size1 = node1.writeSingleRegister(0x03,0x0200);
-     }
-} */
-//****BUTTON ON/OFF SW3****//
-
-//****BUTTON ON/OFF SW4****//
- /*BLYNK_WRITE(Widget_Btn_SW4){
-      int valueSW4 = param.asInt();
-      if(valueSW4 == 1){    
-        //Modbus command to ON/OFF Relay           
-        pool_size1 = node1.writeSingleRegister(0x04,0x0100); 
-      }
-       else{                    
-       pool_size1 = node1.writeSingleRegister(0x04,0x0200);
-     }
-}*/ 
-//****BUTTON ON/OFF SW4****//
-
-//****BUTTON ON/OFF SW5****//
- BLYNK_WRITE(Widget_Btn_SW5){
-      int valueSW5 = param.asInt();
-      if(valueSW5 == 1){    
+//****BUTTON ON/OFF Valve1****//
+ BLYNK_WRITE(Widget_Btn_Valve1){
+      int valueValve1 = param.asInt();
+      if(valueValve1 == 1){    
         //Modbus command to ON/OFF Relay           
         pool_size1 = node1.writeSingleRegister(0x05,0x0100);
       }
@@ -308,12 +264,12 @@ void setup()
        pool_size1 = node1.writeSingleRegister(0x05,0x0200);
      }
 } 
-//****BUTTON ON/OFF SW5****//
+//****BUTTON ON/OFF Valve1****//
 
-//****BUTTON ON/OFF SW6****//
- BLYNK_WRITE(Widget_Btn_SW6){
-      int valueSW6 = param.asInt();
-      if(valueSW6 == 1){    
+//****BUTTON ON/OFF Valve2****//
+ BLYNK_WRITE(Widget_Btn_Valve2){
+      int valueValve2 = param.asInt();
+      if(valueValve2 == 1){    
         //Modbus command to ON/OFF Relay           
         pool_size1 = node1.writeSingleRegister(0x06,0x0100);
       }
@@ -321,33 +277,34 @@ void setup()
        pool_size1 = node1.writeSingleRegister(0x06,0x0200);
      }
 } 
-//****BUTTON ON/OFF SW6****//
+//****BUTTON ON/OFF Valve2****//
 
-//****BUTTON ON/OFF SW7****//
- BLYNK_WRITE(Widget_Btn_SW7){
-      int valueSW7 = param.asInt();
-      if(valueSW7 == 1){    
+//****BUTTON ON/OFF Valve3****//
+ BLYNK_WRITE(Widget_Btn_Valve3){
+      int valueValve3 = param.asInt();
+      if(valueValve3 == 1){    
         //Modbus command to ON/OFF Relay           
-        pool_size1 = node1.writeSingleRegister(0x07,0x0100);
+        pool_size1 = node1.writeSingleRegister(0x07,0x0100); 
       }
        else{                    
        pool_size1 = node1.writeSingleRegister(0x07,0x0200);
      }
 } 
-//****BUTTON ON/OFF SW7****//
+//****BUTTON ON/OFF Valve3****//
 
-//****BUTTON ON/OFF SW8****//
- BLYNK_WRITE(Widget_Btn_SW8){
-      int valueSW8 = param.asInt();
-      if(valueSW8 == 1){    
+//****BUTTON ON/OFF Valve4****//
+ BLYNK_WRITE(Widget_Btn_Valve4){
+      int valueValve4 = param.asInt();
+      if(valueValve4 == 1){    
         //Modbus command to ON/OFF Relay           
-        pool_size1 = node1.writeSingleRegister(0x08,0x0100);
+        pool_size1 = node1.writeSingleRegister(0x08,0x0100); 
       }
        else{                    
        pool_size1 = node1.writeSingleRegister(0x08,0x0200);
      }
 } 
-//****BUTTON ON/OFF SW8****//
+//****BUTTON ON/OFF Valve4****//
+
 
 //=====Blynk connected=====//
 BLYNK_CONNECTED()
